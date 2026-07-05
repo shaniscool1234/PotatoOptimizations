@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "potatofps",
+  "version": "${version}",
+
+  "name": "PotatoFPS",
+  "description": "Aggressive rendering optimizations for old hardware and integrated graphics (Intel HD 2500/4000, DDR3 systems). Targets 40-60 FPS on hardware that normally gets 15 FPS.",
+  "authors": [
+    "PotatoFPS Team"
+  ],
+  "contact": {
+    "sources": "https://github.com/potatofps/potatofps"
+  },
+
+  "license": "MIT",
+  "environment": "client",
+
+  "entrypoints": {
+    "client": [
+      "com.potatofps.PotatoFPS"
+    ],
+    "modmenu": [
+      "com.potatofps.gui.ModMenuIntegration"
+    ]
+  },
+
+  "mixins": [
+    "potatofps.mixins.json"
+  ],
+
+  "accessWidener": "potatofps.accesswidener",
+
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "cloth-config2": "*",
+    "modmenu": "*"
+  }
+}

@@ -1,0 +1,16 @@
+accessWidener v2 named
+
+# Expose private SimpleOption fields in GameOptions so PotatoVideoOptionsScreen
+# can create vanilla option widgets directly (same as vanilla VideoOptionsScreen does
+# internally, but we are an external class).
+
+accessible field net/minecraft/client/option/GameOptions viewDistance        Lnet/minecraft/client/option/SimpleOption;
+accessible field net/minecraft/client/option/GameOptions simulationDistance   Lnet/minecraft/client/option/SimpleOption;
+accessible field net/minecraft/client/option/GameOptions maxFps               Lnet/minecraft/client/option/SimpleOption;
+accessible field net/minecraft/client/option/GameOptions enableVsync          Lnet/minecraft/client/option/SimpleOption;
+accessible field net/minecraft/client/option/GameOptions graphicsMode         Lnet/minecraft/client/option/SimpleOption;
+accessible field net/minecraft/client/option/GameOptions ao                   Lnet/minecraft/client/option/SimpleOption;
+accessible field net/minecraft/client/option/GameOptions cloudRenderMode      Lnet/minecraft/client/option/SimpleOption;
+accessible field net/minecraft/client/option/GameOptions entityShadows        Lnet/minecraft/client/option/SimpleOption;
+accessible field net/minecraft/client/option/GameOptions attackIndicator      Lnet/minecraft/client/option/SimpleOption;
+accessible field net/minecraft/client/option/GameOptions biomeBlendRadius     Lnet/minecraft/client/option/SimpleOption;

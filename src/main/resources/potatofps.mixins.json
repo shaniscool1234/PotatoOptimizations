@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "com.potatofps.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "GameRendererMixin",
+    "WorldRendererMixin",
+    "ChunkBuilderMixin",
+    "EntityRenderDispatcherMixin",
+    "ParticleManagerMixin",
+    "BackgroundRendererMixin",
+    "LightDataMixin",
+    "VideoOptionsScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
