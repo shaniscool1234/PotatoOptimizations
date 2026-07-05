@@ -31,7 +31,7 @@ public abstract class VideoOptionsScreenMixin extends Screen {
 
     /** Capture the parent screen before anything else initialises. */
     @Inject(method = "<init>", at = @At("TAIL"), require = 0)
-    private void potatofps$captureParent(Screen parent, GameOptions options, CallbackInfo ci) {
+    private void potatofps$captureParent(Screen parent, net.minecraft.client.MinecraftClient client, GameOptions options, CallbackInfo ci) {
         this.potatofps$parent = parent;
     }
 
