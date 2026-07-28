@@ -30,10 +30,10 @@ public class ConfigManager {
     /**
      * Pretty-printing GSON instance. Pretty-printing is fine because config is only
      * read/written during load and save — never inside the game loop.
+     * serializeNulls() is intentionally NOT used to keep the config file compact.
      */
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
-            .serializeNulls()
             .create();
 
     private PotatoConfig config;
@@ -112,6 +112,12 @@ public class ConfigManager {
      * gracefully, not cause an OutOfMemoryError allocating a 9000×9000 framebuffer.
      */
     private static PotatoConfig sanitize(PotatoConfig cfg) {
+        // Null-guard: if GSON returned null or a completely broken config
+        if (cfg == null) {
+            PotatoFPS.LOGGER.warn("[PotatoFPS] Config was null after parsing, using defaults");
+            return new PotatoConfig();
+        }
+
         // Clamp render scale to 25%-100%
         cfg.renderScale = Math.max(0.25f, Math.min(1.0f, cfg.renderScale));
 

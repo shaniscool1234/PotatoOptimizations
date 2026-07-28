@@ -135,6 +135,13 @@ public final class ObjectPool {
      *   and triggers a full GC right when performance matters most.
      */
     public static void preWarm() {
+        // Guard against being called before CONFIG is initialized
+        if (PotatoFPS.CONFIG == null) {
+            PotatoFPS.LOGGER.warn("[PotatoFPS] ObjectPool.preWarm() called before CONFIG initialized, using defaults");
+            maxWorkers = 64;
+            return;
+        }
+
         var config = PotatoFPS.CONFIG.getConfig();
         maxWorkers = Math.min(config.objectPoolSize / 4, 64); // Reserve 1/4 pool space for workers
 

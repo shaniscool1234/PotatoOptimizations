@@ -42,15 +42,16 @@ public class PotatoFPS implements ClientModInitializer {
                 (int)(CONFIG.getConfig().renderScale * 100),
                 CONFIG.getConfig().chunkBuilderThreads);
 
-        // 2. Start the async chunk meshing thread pool ASAP.
+        // 2. Pre-warm object pools to avoid GC spikes on first load.
+        //    MUST be called AFTER CONFIG is set, since preWarm() reads CONFIG.
+        ObjectPool.preWarm();
+
+        // 3. Start the async chunk meshing thread pool ASAP.
         //    The pool size defaults to 2 for the i5-3470S (4 cores):
         //    - 1 core for main thread game logic
         //    - 1 core for the OS / background
         //    - 2 cores dedicated to chunk mesh building
         ThreadPoolManager.initialize(CONFIG.getConfig().chunkBuilderThreads);
-
-        // 3. Pre-warm object pools to avoid GC spikes on first load
-        ObjectPool.preWarm();
 
         // 4. Register lifecycle hooks
         registerLifecycleEvents();

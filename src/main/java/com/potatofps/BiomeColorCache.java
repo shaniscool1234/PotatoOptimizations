@@ -31,15 +31,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * EVICTION:
  *   We cap at MAX_ENTRIES. When full, we clear the entire cache (simple LRU approximation).
  *   A full clear is cheap because it happens at most once per 68,000 unique positions queried.
+ *   An overflow guard at MAX_ENTRIES * 1.5 prevents unbounded growth from edge cases.
  */
 public final class BiomeColorCache {
 
     private static final int MAX_ENTRIES = 100_000;
+    private static final int OVERFLOW_LIMIT = (int)(MAX_ENTRIES * 1.5); // 150K — hard ceiling
 
     // Key: (x & 0xFFFFFFFFL) | ((long)(z & 0xFFFFFFFFL) << 32)
     // This packs (x, z) world coordinates into a single long — zero allocation, O(1) hash.
-    private static final ConcurrentHashMap<Long, Integer> grassColorCache = new ConcurrentHashMap<>(MAX_ENTRIES);
-    private static final ConcurrentHashMap<Long, Integer> waterColorCache = new ConcurrentHashMap<>(MAX_ENTRIES);
+    // Initial capacity 16 with concurrencyLevel 4 avoids wasting ~3MB on empty buckets.
+    private static final ConcurrentHashMap<Long, Integer> grassColorCache = new ConcurrentHashMap<>(16, 0.75f, 4);
+    private static final ConcurrentHashMap<Long, Integer> waterColorCache = new ConcurrentHashMap<>(16, 0.75f, 4);
 
     /**
      * Returns the cached grass color at (x, z), or -1 if not cached.
@@ -55,8 +58,11 @@ public final class BiomeColorCache {
      * Evicts all entries if the cache is full (simple global eviction — better than OOM).
      */
     public static void cacheGrassColor(int x, int z, int color) {
-        if (grassColorCache.size() >= MAX_ENTRIES) {
-            grassColorCache.clear(); // Simple full eviction
+        if (grassColorCache.size() >= OVERFLOW_LIMIT) {
+            grassColorCache.clear(); // Hard overflow guard
+            PotatoFPS.LOGGER.warn("[PotatoFPS] BiomeColorCache: grass cache overflow, full clear");
+        } else if (grassColorCache.size() >= MAX_ENTRIES) {
+            grassColorCache.clear(); // Normal eviction
             PotatoFPS.LOGGER.debug("[PotatoFPS] BiomeColorCache: grass cache evicted (full)");
         }
         grassColorCache.put(packPos(x, z), color);
@@ -68,7 +74,10 @@ public final class BiomeColorCache {
     }
 
     public static void cacheWaterColor(int x, int z, int color) {
-        if (waterColorCache.size() >= MAX_ENTRIES) {
+        if (waterColorCache.size() >= OVERFLOW_LIMIT) {
+            waterColorCache.clear();
+            PotatoFPS.LOGGER.warn("[PotatoFPS] BiomeColorCache: water cache overflow, full clear");
+        } else if (waterColorCache.size() >= MAX_ENTRIES) {
             waterColorCache.clear();
         }
         waterColorCache.put(packPos(x, z), color);

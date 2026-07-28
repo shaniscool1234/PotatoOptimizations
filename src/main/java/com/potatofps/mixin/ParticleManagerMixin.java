@@ -100,6 +100,10 @@ public abstract class ParticleManagerMixin {
      *
      * Block breaking particles still need to look responsive, so we allow them
      * through at multiplier > 0.25, even if ambient particles are throttled harder.
+     *
+     * FORMULA: at multiplier=0.0 → 100% rejected; at multiplier=0.25 → 0% rejected.
+     * Linear interpolation between those two points. This is intentionally milder
+     * than the ambient particle throttle.
      */
     @Inject(
         method = "addBlockBreakingParticles",
@@ -110,8 +114,13 @@ public abstract class ParticleManagerMixin {
     private void potatofps$onBlockBreakParticles(CallbackInfo ci) {
         float multiplier = PotatoFPS.CONFIG.getConfig().particleMultiplier;
         // Only suppress block break particles at very aggressive settings (<25%)
-        if (multiplier < 0.25f && RANDOM.get().nextFloat() > multiplier * 4.0f) {
-            ci.cancel();
+        // The throttle is milder: at 0% multiplier, all block break particles are rejected;
+        // at 25% multiplier, none are rejected. Linear in between.
+        if (multiplier < 0.25f) {
+            float rejectionChance = 1.0f - (multiplier / 0.25f); // 1.0 at 0%, 0.0 at 25%
+            if (RANDOM.get().nextFloat() < rejectionChance) {
+                ci.cancel();
+            }
         }
     }
 }
